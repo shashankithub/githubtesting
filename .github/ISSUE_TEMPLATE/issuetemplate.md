@@ -4,7 +4,7 @@ about: Describe the purpose of this issue template
 title: ''
 labels: ''
 assignees: ''
----
+
 
 ## Uncertainty
 
@@ -24,4 +24,5 @@ assignees: ''
 - [ ] Medium
 - [ ] Large
 
+---
 <!-- Add any additional sections or instructions here -->
