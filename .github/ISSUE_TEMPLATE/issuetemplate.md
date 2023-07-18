@@ -6,36 +6,20 @@ labels: ''
 assignees: ''
 ---
 
----
-name: Uncertainty
-about: Specify the level of uncertainty
-type: dropdown
-options:
-  - small
-  - medium
-  - large
----
+## Uncertainty
 
+- [ ] Small
+- [ ] Medium
+- [ ] Large
 
----
-name: Complexity
-about: Specify the level of complexity
-type: dropdown
-options:
-  - small
-  - medium
-  - large
----
+## Complexity
 
----
-name: Complexity
-about: Specify the level of complexity
-type: dropdown
-options:
-  - small
-  - medium
-  - large
----
+- [ ] Small
+- [ ] Medium
+- [ ] Large
 
+## Effort
 
-<!-- Add any additional sections or instructions here -->
+- [ ] Small
+- [ ] Medium
+- [ ] Large
