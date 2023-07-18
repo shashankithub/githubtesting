@@ -1,0 +1,27 @@
+---
+name: Uncertainty
+about: Specify the level of uncertainty
+type: dropdown
+options:
+  - small
+  - medium
+  - large
+---
+---
+name: Complexity
+about: Specify the level of complexity
+type: dropdown
+options:
+  - small
+  - medium
+  - large
+---
+---
+name: Effort
+about: Specify the level of effort
+type: dropdown
+options:
+  - small
+  - medium
+  - large
+---
