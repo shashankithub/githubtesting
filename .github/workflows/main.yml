@@ -23,7 +23,7 @@ jobs:
             // Check if the issue body or fields are updated
             const isIssueUpdated = updatedBody !== issue.body || JSON.stringify(updatedFields) !== JSON.stringify(issue.fields);
 
-            return isIssueUpdated;
+            return { isIssueUpdated: isIssueUpdated };
 
       - name: Calculate SP and add comment
         id: calculate_sp
@@ -105,6 +105,9 @@ jobs:
             
             // Create the comment body
             const commentBody = `The calculated SP value is: ${sp}`;
+            
+            console.log('SP:', sp);
+            console.log('Comment body:', commentBody);
             
             // Add a comment to the issue
             const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
