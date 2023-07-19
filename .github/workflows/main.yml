@@ -26,11 +26,11 @@ jobs:
         with:
           script: |
             const updatedIssue = context.payload.issue;
-            const updatedBody = updatedIssue.body;
-            const updatedFields = updatedIssue.fields;
+            const updatedBody = updatedIssue && updatedIssue.body;
+            const updatedFields = updatedIssue && updatedIssue.fields;
 
             // Check if the issue body or fields are updated
-            const isIssueUpdated = updatedBody !== issue.body || JSON.stringify(updatedFields) !== JSON.stringify(issue.fields);
+            const isIssueUpdated = updatedBody !== (issue && issue.body) || JSON.stringify(updatedFields) !== JSON.stringify(issue && issue.fields);
 
             return { isIssueUpdated: isIssueUpdated };
 
