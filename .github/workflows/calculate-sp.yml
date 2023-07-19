@@ -17,30 +17,30 @@ jobs:
         with:
           script: |
             const updatedIssue = context.payload.issue;
-            const updatedBody = updatedIssue && updatedIssue.body;
             const updatedFields = updatedIssue && updatedIssue.fields;
 
-            // Check if the issue body or fields are updated
-            const isIssueUpdated = updatedBody !== issue.body || JSON.stringify(updatedFields) !== JSON.stringify(issue.fields);
+            // Check if the issue fields are updated
+            const isIssueUpdated = JSON.stringify(updatedFields) !== JSON.stringify(issue.fields);
 
             return { isIssueUpdated: isIssueUpdated };
 
       - name: Calculate SP and add comment
         id: calculate_sp
-        run: |
-          const { github, context, steps } = require("@actions/github");
+        uses: actions/github-script@v4
+        with:
+          script: |
+            const { github, context, steps } = require("@actions/github");
 
-          const issue = context.payload.issue;
-          const body = issue && issue.body;
-          const fields = issue && issue.fields;
+            const issue = context.payload.issue;
+            const fields = issue && issue.fields;
 
-          // Check if the issue or body is missing
-          if (!issue || !body) {
-            console.log('Issue or body is missing. Skipping SP calculation and comment addition.');
-            return;
-          }
+            // Check if the issue or fields are missing
+            if (!issue || !fields) {
+              console.log('Issue or fields are missing. Skipping SP calculation and comment addition.');
+              return;
+            }
 
-          // ... Rest of the code ...
+            // ... Rest of the code ...
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
