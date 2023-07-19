@@ -22,7 +22,7 @@ jobs:
         with:
           script: |
             async function run() {
-              const issue = github.context.payload.issue;
+              const issue = context.payload.issue;
               const body = issue.body;
 
               // Extract the selected attributes from the issue body
@@ -101,8 +101,8 @@ jobs:
               // Add a comment to the issue
               const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
               await octokit.rest.issues.createComment({
-                owner: github.context.repo.owner,
-                repo: github.context.repo.repo,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
                 issue_number: issue.number,
                 body: commentBody
               });
