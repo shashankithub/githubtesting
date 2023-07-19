@@ -10,33 +10,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Use Node.js 16
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
       - name: Checkout Repository
         uses: actions/checkout@v2
 
       # ... Add other steps for your main workflow ...
-
-  calculate_sp:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check if issue is updated
-        id: check_issue
-        uses: actions/github-script@v4
-        with:
-          script: |
-            const updatedIssue = context.payload.issue;
-            const updatedBody = updatedIssue && updatedIssue.body;
-            const updatedFields = updatedIssue && updatedIssue.fields;
-
-            // Check if the issue body or fields are updated
-            const isIssueUpdated = updatedBody !== (issue && issue.body) || JSON.stringify(updatedFields) !== JSON.stringify(issue && issue.fields);
-
-            return { isIssueUpdated: isIssueUpdated };
-
-      - name: Calculate SP and add comment
-        id: calculate_sp
-        uses: ./calculate-sp.yml
-
-env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
