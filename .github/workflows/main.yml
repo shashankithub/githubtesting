@@ -1,13 +1,22 @@
-name: Calculate SP and add comment
+name: Main Workflow
 
 on:
-  issues:
-    types: [opened, edited]
-  issue_comment:
-    types: [created]
+  push:
+    branches:
+      - main
 
 jobs:
-  calculate-sp-and-comment:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      # ... Add other steps for your main workflow ...
+
+  calculate_sp:
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
@@ -27,110 +36,7 @@ jobs:
 
       - name: Calculate SP and add comment
         id: calculate_sp
-        uses: actions/github-script@v4
-        with:
-          script: |
-            const { github, context, steps } = require("@actions/github");
+        uses: ./calculate-sp.yml
 
-            const issue = context.payload.issue;
-            const body = issue.body;
-            const fields = issue.fields;
-
-            // Check if the issue is updated
-            if (context.payload.action === 'edited' && !steps.check_issue.outputs.isIssueUpdated) {
-              console.log('Issue is not updated. Skipping SP calculation and comment addition.');
-              return;
-            }
-
-            // Define the SPT table
-            const sptTable = {
-              small: {
-                small: {
-                  small: 1,
-                  medium: 2,
-                  large: 5
-                },
-                medium: {
-                  small: 2,
-                  medium: 3,
-                  large: 5
-                },
-                large: {
-                  small: 3,
-                  medium: 5,
-                  large: 8
-                }
-              },
-              medium: {
-                small: {
-                  small: 3,
-                  medium: 5,
-                  large: 8
-                },
-                medium: {
-                  small: 5,
-                  medium: 5,
-                  large: 8
-                },
-                large: {
-                  small: 6,
-                  medium: 8,
-                  large: 13
-                }
-              },
-              large: {
-                small: {
-                  small: 8,
-                  medium: 8,
-                  large: 13
-                },
-                medium: {
-                  small: 8,
-                  medium: 8,
-                  large: 13
-                },
-                large: {
-                  small: 8,
-                  medium: 13,
-                  large: 13
-                }
-              }
-            };
-
-            // Retrieve the selected attributes from the issue fields
-            const uncertainty = fields.uncertainty;
-            const complexity = fields.complexity;
-            const effort = fields.effort;
-
-            // Retrieve the corresponding SP value from the SPT table
-            const sp = sptTable[uncertainty][complexity][effort];
-
-            // Create the comment body
-            const commentBody = `The calculated SP value is: ${sp}`;
-
-            console.log('SP:', sp);
-            console.log('Comment body:', commentBody);
-
-            // Add a comment to the issue
-            const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
-            await octokit.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issue.number,
-              body: commentBody
-            });
-
-            // Update the SP field in the issue
-            await octokit.rest.issues.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issue.number,
-              fields: {
-                sp: sp
-              }
-            });
-
-            return sp;
-
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
