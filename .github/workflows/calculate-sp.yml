@@ -21,9 +21,8 @@ jobs:
         uses: actions/github-script@v4
         with:
           script: |
-            const { github, context } = require("@actions/github");
             async function run() {
-              const issue = context.payload.issue;
+              const issue = github.context.payload.issue;
               const body = issue.body;
 
               // Extract the selected attributes from the issue body
@@ -102,8 +101,8 @@ jobs:
               // Add a comment to the issue
               const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
               await octokit.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
                 issue_number: issue.number,
                 body: commentBody
               });
