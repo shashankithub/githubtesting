@@ -1,0 +1,148 @@
+name: Calculate SP and add comment
+
+on:
+  issues:
+    types: [opened, edited]
+  issue_comment:
+    types: [created]
+
+jobs:
+  calculate-sp-and-comment:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if issue is updated
+        id: check_issue
+        uses: actions/github-script@v4
+        with:
+          script: |
+            const updatedIssue = context.payload.issue;
+            const updatedBody = updatedIssue.body;
+            const updatedFields = updatedIssue.fields;
+
+            // Check if the issue body or fields are updated
+            const isIssueUpdated = updatedBody !== issue.body || JSON.stringify(updatedFields) !== JSON.stringify(issue.fields);
+
+            return { isIssueUpdated: isIssueUpdated };
+
+      - name: Calculate SP and add comment
+        id: calculate_sp
+        uses: actions/github-script@v4
+        with:
+          script: |
+            const { github, context, steps } = require("@actions/github");
+
+            const issue = context.payload.issue;
+            const body = issue.body;
+            const fields = issue.fields;
+
+            // Check if the issue is updated
+            if (context.payload.action === 'edited' && !steps.check_issue.outputs.isIssueUpdated) {
+              console.log('Issue is not updated. Skipping SP calculation and comment addition.');
+              return;
+            }
+
+            // Check if the fields object has the required properties
+            if (!fields || !fields.uncertainty || !fields.complexity || !fields.effort) {
+              console.log('One or more required attributes (uncertainty, complexity, effort) are missing from the fields object.');
+              return;
+            }
+
+            // Define the SPT table
+            const sptTable = {
+              small: {
+                small: {
+                  small: 1,
+                  medium: 2,
+                  large: 5
+                },
+                medium: {
+                  small: 2,
+                  medium: 3,
+                  large: 5
+                },
+                large: {
+                  small: 3,
+                  medium: 5,
+                  large: 8
+                }
+              },
+              medium: {
+                small: {
+                  small: 3,
+                  medium: 5,
+                  large: 8
+                },
+                medium: {
+                  small: 5,
+                  medium: 5,
+                  large: 8
+                },
+                large: {
+                  small: 6,
+                  medium: 8,
+                  large: 13
+                }
+              },
+              large: {
+                small: {
+                  small: 8,
+                  medium: 8,
+                  large: 13
+                },
+                medium: {
+                  small: 8,
+                  medium: 8,
+                  large: 13
+                },
+                large: {
+                  small: 8,
+                  medium: 13,
+                  large: 13
+                }
+              }
+            };
+
+            // Retrieve the selected attributes from the issue fields
+            const uncertainty = fields.uncertainty;
+            const complexity = fields.complexity;
+            const effort = fields.effort;
+
+            // Check if the selected attributes exist in the SPT table
+            if (!sptTable[uncertainty] || !sptTable[uncertainty][complexity] || !sptTable[uncertainty][complexity][effort]) {
+              console.log('Invalid combination of attributes (uncertainty, complexity, effort).');
+              return;
+            }
+
+            // Retrieve the corresponding SP value from the SPT table
+            const sp = sptTable[uncertainty][complexity][effort];
+
+            // Create the comment body
+            const commentBody = `The calculated SP value is: ${sp}`;
+
+            console.log('SP:', sp);
+            console.log('Comment body:', commentBody);
+
+            // Add a comment to the issue
+            const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+            await octokit.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: commentBody
+            });
+
+            // Update the SP field in the issue
+            await octokit.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              fields: {
+                sp: sp
+              }
+            });
+
+            return sp;
+
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
