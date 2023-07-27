@@ -20,82 +20,97 @@ jobs:
         id: calculate_sp
         uses: actions/github-script@v4
         with:
-          // Define the SPT table
-          const sptTable = {
-            small: {
-              small: {
-                small: 1,
-                medium: 2,
-                large: 5
-              },
-              medium: {
-                small: 2,
-                medium: 3,
-                large: 5
-              },
-              large: {
-                small: 3,
-                medium: 5,
-                large: 8
+          script: |
+            async function run() {
+              const issue = context.payload.issue;
+              const body = issue.body;
+
+              // Extract the selected attributes from the issue body
+              const uncertainty = body.match(/## Uncertainty\n\n- \[x\] (Small|Medium|Large)/i)?.[1].toLowerCase();
+              const complexity = body.match(/## Complexity\n\n- \[x\] (Small|Medium|Large)/i)?.[1].toLowerCase();
+              const effort = body.match(/## Effort\n\n- \[x\] (Small|Medium|Large)/i)?.[1].toLowerCase();
+
+              if (!uncertainty || !complexity || !effort) {
+                console.log('Required fields are missing from the issue body. Skipping SP calculation and comment addition.');
+                return;
               }
-            },
-            medium: {
-              small: {
-                small: 3,
-                medium: 5,
-                large: 8
-              },
-              medium: {
-                small: 5,
-                medium: 5,
-                large: 8
-              },
-              large: {
-                small: 6,
-                medium: 8,
-                large: 13
-              }
-            },
-            large: {
-              small: {
-                small: 8,
-                medium: 8,
-                large: 13
-              },
-              medium: {
-                small: 8,
-                medium: 8,
-                large: 13
-              },
-              large: {
-                small: 8,
-                medium: 13,
-                large: 13
-              }
+
+              // Define the SPT table
+              const sptTable = {
+                small: {
+                  small: {
+                    small: 1,
+                    medium: 2,
+                    large: 5
+                  },
+                  medium: {
+                    small: 2,
+                    medium: 3,
+                    large: 5
+                  },
+                  large: {
+                    small: 3,
+                    medium: 5,
+                    large: 8
+                  }
+                },
+                medium: {
+                  small: {
+                    small: 3,
+                    medium: 5,
+                    large: 8
+                  },
+                  medium: {
+                    small: 5,
+                    medium: 5,
+                    large: 8
+                  },
+                  large: {
+                    small: 6,
+                    medium: 8,
+                    large: 13
+                  }
+                },
+                large: {
+                  small: {
+                    small: 8,
+                    medium: 8,
+                    large: 13
+                  },
+                  medium: {
+                    small: 8,
+                    medium: 8,
+                    large: 13
+                  },
+                  large: {
+                    small: 8,
+                    medium: 13,
+                    large: 13
+                  }
+                }
+              };
+
+              // Retrieve the corresponding SP value from the SPT table
+              const sp = sptTable[uncertainty][complexity][effort];
+
+              // Create the comment body
+              const commentBody = `The calculated SP value is: ${sp}`;
+
+              console.log('SP:', sp);
+              console.log('Comment body:', commentBody);
+
+              // Add a comment to the issue
+              const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+              await octokit.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: commentBody
+              });
+
+              return sp;
             }
-          };
-
-          // Retrieve the corresponding SP value from the SPT table
-          const sp = sptTable[uncertainty][complexity][effort];
-
-          // Create the comment body
-          const commentBody = `The calculated SP value is: ${sp}`;
-
-          console.log('SP:', sp);
-          console.log('Comment body:', commentBody);
-
-          // Add a comment to the issue
-          const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
-          await octokit.rest.issues.createComment({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            issue_number: issue.number,
-            body: commentBody
-          });
-
-          return sp;
-        }
-        run();
+            run();
 
 
 env:
