@@ -7,15 +7,8 @@ on:
 jobs:
   calculate-sp-and-comment:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Use Node.js 16
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-
       - name: Calculate SP and add comment
-        id: calculate_sp
         uses: actions/github-script@v4
         with:
           script: |
@@ -23,15 +16,16 @@ jobs:
               const issue = context.payload.issue;
               const body = issue.body;
 
-              console.log('Issue body:', body);  // log the entire issue body
+              console.log('Issue body:', body);
 
               // Extract the selected attributes from the issue body
               const uncertainty = body.match(/## Uncertainty\n\nPlease select one:\n\n- \[x\] (Small|Medium|Large)/i)?.[1].toLowerCase();
-              const complexity = body.match(/## Complexity\n\nPlease select one:\n\n- \[x\] (Small|Medium|Large)/i)?.[1].toLowerCase();
-              const effort = body.match(/## Effort\n\nPlease select one:\n\n- \[x\] (Small|Medium|Large)/i)?.[1].toLowerCase();
+              console.log('Uncertainty:', uncertainty);
 
-              console.log('Uncertainty:', uncertainty);  // log the match results
+              const complexity = body.match(/## Complexity\n\nPlease select one:\n\n- \[x\] (Small|Medium|Large)/i)?.[1].toLowerCase();
               console.log('Complexity:', complexity);
+
+              const effort = body.match(/## Effort\n\nPlease select one:\n\n- \[x\] (Small|Medium|Large)/i)?.[1].toLowerCase();
               console.log('Effort:', effort);
 
               if (!uncertainty || !complexity || !effort) {
@@ -115,8 +109,6 @@ jobs:
               return sp;
             }
             run();
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
 
 
 
