@@ -7,15 +7,21 @@ assignees: ''
 ---
 
 ## Uncertainty
-Please select one: Small, Medium, Large
+Please select one:
+- [ ] Small
+- [ ] Medium
+- [ ] Large
 
 ## Complexity
-Please select one: Small, Medium, Large
+Please select one:
+- [ ] Small
+- [ ] Medium
+- [ ] Large
 
 ## Effort
-Please select one: Small, Medium, Large
+Please select one:
+- [ ] Small
+- [ ] Medium
+- [ ] Large
 
-Please fill in all the fields above.
-
-## Comments
-<!-- Story point will be calculated and added here automatically. -->
+> Please ensure all fields are filled out for the Story Points calculation to occur. 
