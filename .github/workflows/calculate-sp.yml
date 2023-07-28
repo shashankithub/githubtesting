@@ -3,8 +3,6 @@ name: Calculate SP and add comment
 on:
   issues:
     types: [opened, edited]
-  issue_comment:
-    types: [created]
 
 jobs:
   calculate-sp-and-comment:
@@ -25,10 +23,16 @@ jobs:
               const issue = context.payload.issue;
               const body = issue.body;
 
+              console.log('Issue body:', body);  // log the entire issue body
+
               // Extract the selected attributes from the issue body
               const uncertainty = body.match(/## Uncertainty\n\n- \[x\] (Small|Medium|Large)/i)?.[1].toLowerCase();
               const complexity = body.match(/## Complexity\n\n- \[x\] (Small|Medium|Large)/i)?.[1].toLowerCase();
               const effort = body.match(/## Effort\n\n- \[x\] (Small|Medium|Large)/i)?.[1].toLowerCase();
+
+              console.log('Uncertainty:', uncertainty);  // log the match results
+              console.log('Complexity:', complexity);
+              console.log('Effort:', effort);
 
               if (!uncertainty || !complexity || !effort) {
                 console.log('Required fields are missing from the issue body. Skipping SP calculation and comment addition.');
@@ -111,6 +115,7 @@ jobs:
               return sp;
             }
             run();
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
 
 
